@@ -2,12 +2,17 @@
 //  GameBoard.swift
 //  Chapter2
 //
-//  Created by Mauro Bolis on 15/11/2016.
-//  Copyright © 2016 Bending Spoons. All rights reserved.
-//
+//  Copyright © 2016 Bending Spoons.
+//  Distributed under the MIT License.
+//  See the LICENSE file for more information.
 
 import Foundation
 import Katana
+import KatanaElements
+
+enum Player {
+  case one, two
+}
 
 struct GameBoard: NodeDescription {
   typealias PropsType = Props
@@ -37,7 +42,7 @@ extension GameBoard {
 }
 
 extension GameBoard {
-  struct Props: NodeDescriptionProps {
+  struct Props: NodeDescriptionProps, Buildable {
     var frame: CGRect = .zero
     var key: String?
     var alpha: CGFloat = 1.0

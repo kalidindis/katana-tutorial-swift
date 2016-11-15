@@ -14,6 +14,7 @@
 		A18091011DDB0BF0004EC365 /* KatanaElements+GameBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A18090FF1DDB0BF0004EC365 /* KatanaElements+GameBoard.swift */; };
 		A18091021DDB0BF0004EC365 /* UIColor+GameBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A18091001DDB0BF0004EC365 /* UIColor+GameBoard.swift */; };
 		A18091041DDB1079004EC365 /* GameBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A18091031DDB1079004EC365 /* GameBoard.swift */; };
+		A1B722681DDBA846009369B3 /* GameCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B722671DDBA846009369B3 /* GameCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +28,7 @@
 		A18090FF1DDB0BF0004EC365 /* KatanaElements+GameBoard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "KatanaElements+GameBoard.swift"; sourceTree = "<group>"; };
 		A18091001DDB0BF0004EC365 /* UIColor+GameBoard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+GameBoard.swift"; sourceTree = "<group>"; };
 		A18091031DDB1079004EC365 /* GameBoard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameBoard.swift; sourceTree = "<group>"; };
+		A1B722671DDBA846009369B3 /* GameCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameCell.swift; sourceTree = "<group>"; };
 		EF88367BB7D59A0EF959ED29 /* Pods-Chapter2.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Chapter2.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Chapter2/Pods-Chapter2.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -86,6 +88,7 @@
 				A18090FF1DDB0BF0004EC365 /* KatanaElements+GameBoard.swift */,
 				A18091001DDB0BF0004EC365 /* UIColor+GameBoard.swift */,
 				A18091031DDB1079004EC365 /* GameBoard.swift */,
+				A1B722671DDBA846009369B3 /* GameCell.swift */,
 			);
 			path = GameBoard;
 			sourceTree = "<group>";
@@ -229,6 +232,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1B722681DDBA846009369B3 /* GameCell.swift in Sources */,
 				A18091041DDB1079004EC365 /* GameBoard.swift in Sources */,
 				A1450DF91DDB0B4D0043ADBB /* AppDelegate.swift in Sources */,
 				A18091021DDB0BF0004EC365 /* UIColor+GameBoard.swift in Sources */,
