@@ -28,4 +28,3 @@ Those are some chapters we want to add in the future:
 
 * Refactor the UI. How can we split the various instances of `NodeDescription`? What are the best pratices when it comes to connect descriptions to the store?
 * How can we leverage protocols to avoid type casting in actions?
-* ​
