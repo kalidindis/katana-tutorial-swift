@@ -15,7 +15,7 @@ Since we are not going to use storyboard, delete `Main.storyboard`.  If you try 
 Close Xcode and create a file named `Podfile` in the root of your project. Open the file and add this content:
 
 ```ruby
-platform :ios, '10.0'
+platform :ios, '8.3'
 use_frameworks!
 
 target 'HelloWorld' do
