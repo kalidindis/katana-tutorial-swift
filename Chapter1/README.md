@@ -8,7 +8,7 @@ In this chapter we discuss how to create a project that leverages Katana. We wil
 
 Let's start by creating a new Xcode project. Select the `Single View Application` template and use  `HelloWorld` as project name.
 
-Since we are not going to use storyboard, delete `Main.storyboard`.  If you try to run the project now, it will crash because the system tries to load the storyboard file that we have just deleted. To fix this, select your project, go to the `General` tab and search for the `Main Interface` entry. Delete the value, which should be `main`, and try again. This time you should see a black screen. If it doesn't work, try to make a clean build first (<kbd>shift<kbd>+<kbd>cmd<kbd>+<kbd>k<kbd>) and then run again.
+Since we are not going to use storyboard, delete `Main.storyboard`.  If you try to run the project now, it will crash because the system tries to load the storyboard file that we have just deleted. To fix this, select your project, go to the `General` tab and search for the `Main Interface` entry. Delete the value, which should be `main`, and try again. This time you should see a black screen. If it doesn't work, try to make a clean build first (<kbd>Shift</kbd>+<kbd>Cmd</kbd>+<kbd>K</kbd>) and then run again.
 
 ### Import Katana
 
