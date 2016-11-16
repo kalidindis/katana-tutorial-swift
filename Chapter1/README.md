@@ -1,6 +1,6 @@
 # Chapter 1 - Getting Started
 
-In this chapter we discuss how to create a project that leverages Katana. We will use [CocoaPods](https://cocoapods.org/) as a dependency manager, but you can also use [Carthage](https://github.com/Carthage/Carthage) or just drop the Katana project into your application. See the the [Katana repository](https://github.com/BendingSpoons/katana-swift/) for more information.
+In this chapter we discuss how to create a project that leverages Katana. We will use [CocoaPods](https://cocoapods.org/) as a dependency manager, but you can also use [Carthage](https://github.com/Carthage/Carthage) or just drop the Katana project into your application. See the [Katana repository](https://github.com/BendingSpoons/katana-swift/) for more information.
 
 
 
@@ -8,7 +8,7 @@ In this chapter we discuss how to create a project that leverages Katana. We wil
 
 Let's start by creating a new Xcode project. Select the `Single View Application` template and use  `HelloWorld` as project name.
 
-Since we are not going to use storyboard, delete `Main.storyboard`.  If you try to run the project now, it will crash because the system tries to load the storyboard file that we have just deleted. To fix this, select your project, go in the `General` tab and search for the `Main Interface` entry. Delete the value, which should be `main`, and try again. This time you should see a black screen. If it doesn't work, try to make a clean build first (shift+command+K) and then run again.
+Since we are not going to use storyboard, delete `Main.storyboard`.  If you try to run the project now, it will crash because the system tries to load the storyboard file that we have just deleted. To fix this, select your project, go to the `General` tab and search for the `Main Interface` entry. Delete the value, which should be `main`, and try again. This time you should see a black screen. If it doesn't work, try to make a clean build first (<kbd>shift<kbd>+<kbd>cmd<kbd>+<kbd>k<kbd>) and then run again.
 
 ### Import Katana
 
@@ -24,7 +24,7 @@ target 'HelloWorld' do
 end
 ```
 
-Open a terminal, go in the project's directory and type:
+Open a terminal, go to the project's directory and type:
 
 ```shell
 pod install
@@ -104,7 +104,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 ```
 
-Here we are basically asking Katana to render with the description we just created. Once again, don't worry about the details: we will explore them in the [next chapter](../Chapter2/README.md).
+Here we are basically asking Katana to render the UI using the description we just created. Once again, don't worry about the details: we will explore them in the [next chapter](../Chapter2/README.md).
 
 Save, build and run. You should now see a white screen with a black text at the center of the screen!
 
