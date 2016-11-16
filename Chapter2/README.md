@@ -150,6 +150,8 @@ In **(2)** we leverage the `gameBoardLabelProps` method to create the properties
 
 In **(3)** we just return the children of our description and let Katana do the job for us.
 
+Note that Katana renders the views in the same order the related descriptions are returned in the `childrenDescriptions` method. In the example above, for instance, the background will be behind the two labels.
+
 
 If you try to compile the application now, you will receive some compilation errors due to the fact that we didn't defined the keys yet. Let's do it now: update the `ChildrenKey` enum in this way:
 
@@ -174,13 +176,13 @@ For more information about Plastic, you can refer to the [Objc implementation wi
 
 
 
-Alright, back to our layoit. Let's start by defining the `reference size` of `GameBoard`. The first step is to adopt the `PlasticReferenceSizeable` protocol in the `GameBoard` struct. We then need to have a `referenceSize` variable.  Since we use an iPhone 5 as reference, and we decided that it should be fullscreen, the value will be the following
+Alright, back to our layout. Let's start by defining the `reference size` of `GameBoard`. The first step is to adopt the `PlasticReferenceSizeable` protocol in the `GameBoard` struct. We then need to have a `referenceSize` variable.  Since we use an iPhone 5 as reference, and we decided that it should be fullscreen, the value will be the following
 
 ```swift
 static var referenceSize = CGSize(width: 320, height: 568)
 ```
 
-Once again, the reference size is the size of the piece of UI in the reference device. Since we use an iPhone5 and the GameBoard is full screen, we simply use the screen size of the iPhone 5. Note that this step is no necessary in the descriptions that are in the hierarchy under GameBoard. They will just use the information defined in GameBoard.
+Once again, the reference size is the size of the piece of UI in the reference device. Since we use an iPhone5 and the GameBoard is full screen, we simply use the screen size of the iPhone 5. Note that this step is not necessary in the descriptions that are in the hierarchy under GameBoard. They will just use the information defined in GameBoard.
 
 
 We are now ready to implement the logic of our layout.  Let' start by adding the `PlasticNodeDescription` protocol to `GameBoard`. It requires to define a new method: `layout(views: ViewsContainer<Keys>, props: PropsType, state: StateType)`. This is exaclty the method we can use to define our layout. Let's implement it:
@@ -224,7 +226,7 @@ Build and run, you should see the two labels in the screen!
 
 Let's move to the next piece: the button we will use to start a new game when the previous one is finished.
 
-As before, let's add the description first in the `childrenDescriptions` method:
+As before, let's first add the description in the `childrenDescriptions` method:
 
 ```swift
 var children = [...]
@@ -247,7 +249,7 @@ We are leveraging our `props` to conditionally return the button. Katana will ta
 As before, we need to add `startButton` in the `ChildrenKeys` enum.
 
 
-The second part is add the layout. Add these lines to the `layout` method
+The second thing to do is adding the layout logic. Add these lines to the `layout` method
 
 ```swift
 let startButton = views[.startButton]
@@ -255,7 +257,7 @@ startButton?.asFooter(nativeView, insets: .scalable(0, 10, 10, 10))
 startButton?.height = .scalable(40)
 ```
 
-As you can see `Plastic` has several helper methods to quickly define your layout and make the code more readable. `asFooter` is just an example, but you can find all of them here and [here](https://bendingspoons.github.io/katana-swift/Classes/PlasticView.html) and [here](https://bendingspoons.github.io/katana-swift/Extensions/Array.html).
+As you can see `Plastic` has several helper methods to quickly define your layout and make the code more readable. `asFooter` is just an example, but you can find all of them here and [here](https://bendingspoons.github.io/katana-swift/Classes/PlasticView.html) and [here](https://bendingspoons.github.io/katana-swift/Extensions/Array.html). As you can see, we are keeping the `startButton` variable as an optional. We cannot use the bang operator, as we did before, because the are cases (that is, when `props.isGameFinished` is false) in which we don't have the button, and use a bang operator would trigger a runtime crash. 
 
 Build and run, you should see the labels and the button!
 
