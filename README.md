@@ -16,8 +16,9 @@ The tutorial is divided into different chapters. Each chapter will be focused on
 
 ### Chapters
 
-* [Chapter 1 - Getting Started](/chapter1/README.md): Let's start from the basics:  how to create a very simple "Hello World" application from scratch using CocoaPods (**Not Added Yet**)
-* [Chapter 2 - UI](/chapter2/README.md): This chapter explains how we can leverage Katana to create the game's UI (**Not Added Yet**)
+
+* [Chapter 1 - Getting Started](./Chapter1/README.md): Let's start from the basics:  how to create a very simple "Hello World" application from scratch using CocoaPods
+* [Chapter 2 - UI](./Chapter2/README.md): This chapter explains how we can leverage Katana to create the game's UI
 * [Chapter 3 - Game Logic](/chapter3/README.md): Let's add some logic to the game using the powerful Katana action system (**Not Added Yet**)
 * [Chapter 4 - Animations](/chapter4/README.md): Every good game has some fancy animations, let's see how we can add them to our game! (**Not Added Yet**)
 * [Chapter 5 - Save And Load A Match](/chapter4/README.md): What happens when in a Katana application you need to deal with external services? Let's discuss it by adding a new feature to our game: save and load a match! (**Not Added Yet**)
