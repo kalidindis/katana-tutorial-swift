@@ -4,7 +4,7 @@ In this chapter we'll develop the game logic using the Katana architecture.
 
 ### Explore the project
 
-We created a project template, which is exactly the final project of the previous chapter. You can find it in the `Source/Initial` folder. 
+We created a project template, which is exactly the previous chapter final project. You can find it in the `Source/Initial` folder. 
 
 Before starting we need to install the dependencies using `CocoaPods`. Open a terminal and go to the `Source/Initial` folder. Then type:
 
@@ -21,17 +21,15 @@ We also added a new file: `GameUtils.swift`. This file contains a method that en
 Before starting the implementation of the game's logic, we want to give an overview of how the business logic is structured in Katana applications.
 
 
-The first difference with respect to MVC approach, which is the most common one in iOS development, is that we only have a single source of truth. Every single piece of information related to the application should be stored in a single place. We call this place **store**. Starting from the information we have in the store, we can describe our UI. Every time something changes in the store, Katana recomputes the UI desciption of the application. This may seems very computationally expensive, but in reality it isn't. Katana, in fact, is able to perform several checks and adopt strategies to minimise the UI computation.
+The first difference with respect to the MVC approach, which is the most common one in iOS development, is that we only have a single source of truth. Every single piece of information should be stored in a single place. We call this place **store**. Starting from the information we have in the store we can describe our UI. Every time something changes in the store, Katana recomputes the UI desciption of the application. This may seem very computationally expensive, but in reality it isn't. Katana, in fact, is able to perform several checks and adopt strategies to minimise the UI computation.
 
-As we discussed in the second chapter, we don't put any business logic in the UI description. The question now is: how can we change the store when the user interacts with the application? Katana provides the concept of **action**. An action represents an intent to do something, or a signal that something has happened. When an action is dispatched, the state is updated and this triggers an update of the UI.
+As we discussed in the second chapter, we don't put any business logic in the UI description. The question now is: how can we change the store when users interact with the application? In Katana we can leverage the **actions** to update the store. An action represents an intent to do something, or a signal that something has occurred. When an action is dispatched, the state is updated and this triggers an update of the UI.
 
-This approach is very different from the common ones in the iOS development world. So we did we decided to adopt it for Katana? There are many reasons, but the main ones are:
+This approach is very different from the common ones in the iOS development world. Why did we decided to adopt it for Katana? There are many reasons, but the main ones are:
 
-- The architecture is predictable: information flow in a single direction (store, ui, action and then store) 
-- Having a single source of truth instead of many managers (or models) with their own state means that is easier to see and understand the state of the application. Think about a situation where you have a crash (maybe in production): you can dump the store and the action that caused the bug. With this dump you can reproduce the crash in your development environment. This is extremely powerful
+- The architecture is predictable: information flow in a single direction (store, ui, action and then store again) 
+- Having a single source of truth instead of many managers (or models) with their own state means that is easier to see and understand the state of the application. Think about a situation where you have a crash (maybe in production): you can dump the store and the action that led to the bug. With this dump you can reproduce the crash in your development environment: this is extremely powerful
 - Every single piece of the architecture is meant to be easily testable. This is very important, especially in complex applications
-
-
 
 
 Now that we have a general idea about the architecture, let's move to the fun part: implement the logic of our game.
@@ -85,10 +83,9 @@ struct ApplicationState: State {
 
 
 
-As you can see, the struct contains pretty much the same information of the `GameBoard` description we created in the previous chapter. This is not always the case, most of the time there isn't a 1:1 association between the two parts of Katana. The application we are developing is very easy, so this is pretty normal.
+As you can see, the struct contains pretty much the same information of the `GameBoard` description we created in the previous chapter. This is not always the case, most of the time there isn't a 1:1 association between the store structure and the various descriptions properties.
 
-
-Let's take a look at the code. In **(1)** we adopt the `State` protocol: the struct that contains the application's state should always implement this protocol. In **(2)** we have an empty initializer. This a requirement of the `State` protocol and is used by Katana to create the initial state.
+Let's take a look at the code. In **(1)** we adopt the `State` protocol: the struct that contains the application's state should always implement this protocol. In **(2)** we have an empty initializer. This a requirement of the `State` protocol and it is used by Katana to create the initial configuration of the application.
 
 Note that in this application we are storing everything in a single struct, since we don't need to manage a large amount of information. In a real world case, you should divide your state in different structures. The only constraint that Katana has is that there is a "root" structure that is used as entry point for your state.
 
@@ -103,7 +100,7 @@ self.renderer = Renderer(rootDescription: intro, store: store)
 
 In the first row we are creating the store that will hold the application's state while in the second row we are passing it to the `Renderer` constructor. The `Renderer` instance is now able to inject the store information in the UI and trigger UI updates when the store changes.
 
-Let's first discuss how we can inject information in our UI descriptions. Katana allows developer to decide which descriptions need the store's information (we call these descriptions "connected") and which portion of the information each description needs.
+Let's first discuss how we can inject information in our UI descriptions. Katana allows developers to decide which descriptions need the store's information (we call these descriptions "connected") and which portion of the information each description needs.
 
 Open the `GameBoard` description and adop the `ConnectedNodeDescription` protocol. This protocol requires a new `associatedtype`:  `StoreState`. Add this line to your description:
 
@@ -124,12 +121,14 @@ static func connect(props: inout PropsType, to storeState: StoreState) {
 }
 ```
 
-The idea of this method is that you receive the properties that however created the description has specificed (e.g., in the `GameBoard` case, we will receive the properties defined in the `AppDelegate`, since it is the place where we have created the `GameBoard` ) and you can udpdate them with some of the information coming from the store. Try to change the `ApplicationState`'s `init` method: you should see the UI change accordingly.
+The idea of this method is that you receive the properties that whoever has created the description has specificed (e.g., in the `GameBoard` case, we will receive the properties defined in the `AppDelegate`, since it is the place where we have created the `GameBoard` ) and you can udpdate them with some of the information coming from the store.
+
+Try to change the `ApplicationState`'s `init` method: you should see the UI change accordingly.
 
 The second point we want to discuss is: how Katana knows which descriptions need to be updated when the store changes? From a theoretically point of view, you don't need to know it: you should reason as the UI is **entirely** created from scratch every time the store changes. If you are interested in technical details, though, here is how Katana works:
 
-* When the store changes, Katana search the descriptions that are connected to the store
-* Katana then computes the new properties for each of the description by invoking the `connect` method
+* When the store changes, Katana searches the descriptions that are connected to the store
+* Katana then computes the new properties for each of the connected descriptions by invoking the `connect` method
 * For each description which properties are changed, Katana will trigger an UI update. The equality comparison is performed using the Swift `Equatable` protocol
 
 As you can see, the process is entirely managed by Katana. You don't need to do anything special to handle store changes, just implement the `childrenDescriptions` method according to your properties.
@@ -193,9 +192,7 @@ As you can see in **(1)**, we can create an action by simply adopting the `SyncA
 The core of the action is **(2)**. The `updateState` method is invoked by Katana to create the new store's state. There are two important things you need to remember when you implement this method:
 
 * You should **always** return a new copy of the store's state. If you use structs to implement the state (and you really should) this works out of the box
-* The method **must be a pure function**. A [pure function](https://en.wikipedia.org/wiki/Pure_function) is a function that always evaluates the same result value given the same argument values. It also doesn't contains side effects. As a rule of thumb, don't put disk interactions, API calls or anything related to external sources of information beside the action and the store in the method implementation. This may seem a big limitation but it is actually very important for many reasons. For instance, having pure `updateState` methods means that you can easily test this part of the logic because they are 100% predictable. Katana provides another way to add your side effects (e.g., API call), we will discuss it in the [fifth chapter](../Chapter5/README.md)
-
-
+* The method **must be a pure function**. A [pure function](https://en.wikipedia.org/wiki/Pure_function) is a function that always evaluates the same result value given the same argument values. It also doesn't contains side effects. As a rule of thumb, don't put disk interactions, API calls or anything related to external sources of information in the method implementation. This may seem a big limitation, but it is actually very important for many reasons. For instance, having pure `updateState` methods means that you can easily test this part of the logic since pure functions are 100% predictable. Katana provides a way to add your side effects (e.g., API call), we will discuss it in the [fifth chapter](../Chapter5/README.md)
 
 We now have the action, but we need to trigger it somewhere.
 
@@ -230,7 +227,7 @@ var children: [AnyNodeDescription] = [
 
 
 
-Try to compile the application now: you should receive some errors in `GameBoard`.  We need, in fact, update the `GameCell` descriptions. Add this variable to the `GameBoard`'s `childrenDescriptions` method, just under the `winningLine` variable:
+Try to compile the application now: you should receive some errors in `GameBoard`.  We need, in fact, update the `GameCell` descriptions. Add the `cellCallback` variable in the `GameBoard`'s `childrenDescriptions` method, just under the `winningLine` variable:
 
 ```swift
 let cellCallback = { (index: Int) in
@@ -243,9 +240,9 @@ let cellCallback = { (index: Int) in
 }
 ```
 
-The important part here is **(1)**: when the cell is tapped, the closure will dispatch the action we created before with the proper cell's index. This will trigger a state update, which in turn will trigger a UI update.
+The important part here is **(1)**: when the cell is tapped, the closure will dispatch the action we created before with the proper cell's index. This will trigger a state update, which in turn will trigger an UI update.
 
-The last step is to update the cells in the following way:
+The last step is to update the cell descriptions in the following way:
 
 ```swift
       GameCell(props: GameCell.Props(key: Keys.cell1, player: props.board[0], isWinningCell: winningLine.contains(0), didTap: cellCallback(0))),
@@ -269,14 +266,14 @@ The last step is to update the cells in the following way:
 
 We basically passed the proper `didTap` parameter to each cell.
 
-Compile and run: you should be able to play with the cells now!
+Compile and run: you should be able to tap the cells now and see them change!
 
 ### Manage A New Game
 
-We miss just one piece of logic to complete our game: start a new match when the current one is finished. In the current implementation, in fact, when the match finishes (either because a player won, or because there are no more valid moves) the new game button appears, but it doesn't do anything.
+We miss one piece of logic to complete our game: start a new match when the current one is finished. In the current implementation, in fact, when the match finishes (either because a player won, or because there are no more valid moves) the new game button appears, but it doesn't do anything.
 
 
-We need to create and then connect a new action. Let's create a new file named `NewGame.swift` and paste the following code:
+We need to create and then connect a new action. Let's fist create a new file named `NewGame.swift` and paste the following code:
 
 ```swift
 import Foundation
@@ -300,9 +297,9 @@ struct NewGame: SyncAction {
 }
 ```
 
-As we did before, we have basically created a new struct and implemented the `SyncAction` protocol. The `updateState` method just creates a new `ApplicationState` and copies the information we need to retain, which is the player scores.
+As we did before, we have created a new struct and implemented the `SyncAction` protocol. The `updateState` method just creates a new `ApplicationState` and copies the pieces information we need to retain, which are the player scores.
 
-We now need to dispatch it when the new game button is tapped. Open the `GameBoard` file and update the button description in the `childrenDescriptions` method:
+We now need to dispatch the action when the new game button is tapped. Open the `GameBoard` file and update the button description in the `childrenDescriptions` method:
 
 ```swift
 if props.isGameFinished {
@@ -320,7 +317,7 @@ Build and run: you should now be able to play multiple matches! Hurray!
 
 ### Wrap It Up: What We have Learnt
 
-In this chapter we have learnt how to create develope the logic of our Katana applications. In particular:
+In this chapter we have learnt how to develop the logic of our Katana applications. In particular:
 
 * How to create the application's state
 * How to connect the UI to the store and how Katana is able to handle store's changes
