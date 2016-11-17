@@ -10,7 +10,7 @@ Before starting, let's take a look at what we will build
 
 
 
-The tutorial is divided into different chapters. Each chapter will be focused on a very specific topic and the idea is that, by following all the chapters, the result will be the Tic Tac Toe game. It is also possible to focus your attention to only some of the chapters, since each chapter provides a starting point for what will be discussed.
+The tutorial is divided into different chapters. Each chapter will be focused on a very specific topic and the idea is that, by following all the chapters, the result will be the Tic Tac Toe game. It is also possible to focus your attention only to some of the chapters, since each chapter provides a starting point for what will be discussed.
 
 
 
