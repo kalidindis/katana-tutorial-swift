@@ -272,5 +272,63 @@ Compile and run: you should be able to play with the cells now!
 
 ### Manage A New Game
 
+We miss just one piece of logic to complete our game: start a new match when the current one is finished. In the current implementation, in fact, when the match finishes (either because a player won, or because there are no more valid moves) the new game button appears, but it doesn't do anything.
+
+
+We need to create and then connect a new action. Let's create a new file named `NewGame.swift` and paste the following code:
+
+```swift
+import Foundation
+import Katana
+
+struct NewGame: SyncAction {
+  var payload: ()
+  
+  static func updatedState(currentState: State, action: NewGame) -> State {
+    guard let state = currentState as? ApplicationState else {
+    	fatalError("Invalid state")
+    }
+    
+    // Create a new state and assign values we should retain (scores)
+    var newState = ApplicationState()
+    newState.player1Score = state.player1Score
+    newState.player2Score = state.player2Score
+    
+    return newState
+  }
+}
+```
+
+As we did before, we have basically created a new struct and implemented the `SyncAction` protocol. The `updateState` method just creates a new `ApplicationState` and copies the information we need to retain, which is the player scores.
+
+We now need to dispatch it when the new game button is tapped. Open the `GameBoard` file and update the button description in the `childrenDescriptions` method:
+
+```swift
+if props.isGameFinished {
+  let startButton = Button(props: .startButtonProps(
+    title: "New Game",
+    key: Keys.startButton,
+    didTap: { dispatch(NewGame()) }
+    ))
+
+  children.append(startButton)
+}
+```
+
+Build and run: you should now be able to play multiple matches! Hurray!
+
 ### Wrap It Up: What We have Learnt
 
+In this chapter we have learnt how to create develope the logic of our Katana applications. In particular:
+
+* How to create the application's state
+* How to connect the UI to the store and how Katana is able to handle store's changes
+* How to trigger actions that can update the store's state
+
+
+You can find the final result in the `Source/Final` folder.
+
+
+
+
+In the [next chapter](../Chapter4/README.md), we'll add some cool animations to our game!
