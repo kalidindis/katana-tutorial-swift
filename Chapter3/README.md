@@ -149,15 +149,16 @@ struct PlayerDidTapCell: SyncAction {
   var payload: Int
   
   // 2
-  static func updatedState(currentState: State, action: PlayerDidTapCell) -> State {
+  func updatedState(currentState: State) -> State {
     guard var state = currentState as? ApplicationState else {
     	fatalError("Invalid state")
     }
     
-    state.board[action.payload] = state.turn
+    let cellIndex = self.payload
+    state.board[cellIndex] = state.turn
     
     // check if we have a winner
-    let winningLine = GameUtils.winningLine(for: state.board, lastMove: action.payload)
+    let winningLine = GameUtils.winningLine(for: state.board, lastMove: cellIndex)
     if let winningLine = winningLine {
       state.isGameFinished = true
       state.winningLine = winningLine
@@ -284,7 +285,7 @@ import Katana
 struct NewGame: SyncAction {
   var payload: ()
   
-  static func updatedState(currentState: State, action: NewGame) -> State {
+  func updatedState(currentState: State) -> State {
     guard let state = currentState as? ApplicationState else {
     	fatalError("Invalid state")
     }
