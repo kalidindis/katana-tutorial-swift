@@ -94,7 +94,181 @@ Note that in this application we are storing everything in a single struct, sinc
 
 ### Connect The State To The UI
 
+The next step is connecting the Store's state to the UI. Open `AppDelegate.swift` and change the `Renderer` initialisation in the following way:
+
+```swift
+let store = Store<ApplicationState>()
+self.renderer = Renderer(rootDescription: intro, store: store)
+```
+
+In the first row we are creating the store that will hold the application's state while in the second row we are passing it to the `Renderer` constructor. The `Renderer` instance is now able to inject the store information in the UI and trigger UI updates when the store changes.
+
+Let's first discuss how we can inject information in our UI descriptions. Katana allows developer to decide which descriptions need the store's information (we call these descriptions "connected") and which portion of the information each description needs.
+
+Open the `GameBoard` description and adop the `ConnectedNodeDescription` protocol. This protocol requires a new `associatedtype`:  `StoreState`. Add this line to your description:
+
+```swift
+typealias StoreState = ApplicationState
+```
+
+We also need to implement a new method:
+
+```swift
+static func connect(props: inout PropsType, to storeState: StoreState) {
+  props.isGameFinished = storeState.isGameFinished
+  props.turn = storeState.turn
+  props.board = storeState.board
+  props.player1Score = storeState.player1Score
+  props.player2Score = storeState.player2Score
+  props.winningLine = storeState.winningLine
+}
+```
+
+The idea of this method is that you receive the properties that however created the description has specificed (e.g., in the `GameBoard` case, we will receive the properties defined in the `AppDelegate`, since it is the place where we have created the `GameBoard` ) and you can udpdate them with some of the information coming from the store. Try to change the `ApplicationState`'s `init` method: you should see the UI change accordingly.
+
+The second point we want to discuss is: how Katana knows which descriptions need to be updated when the store changes? From a theoretically point of view, you don't need to know it: you should reason as the UI is **entirely** created from scratch every time the store changes. If you are interested in technical details, though, here is how Katana works:
+
+* When the store changes, Katana search the descriptions that are connected to the store
+* Katana then computes the new properties for each of the description by invoking the `connect` method
+* For each description which properties are changed, Katana will trigger an UI update. The equality comparison is performed using the Swift `Equatable` protocol
+
+As you can see, the process is entirely managed by Katana. You don't need to do anything special to handle store changes, just implement the `childrenDescriptions` method according to your properties.
+
 ### Manage The Cell Tap
+
+We have now connected the UI to the store, but how can we update the state (and so the UI) when the user does something? As we said before, we can leverage actions to achieve this goal.
+
+Let's start by implementing the action: create a new file named `PlayerDidTapCell.swift` and paste the following code:
+
+```swift
+import Foundation
+import Katana
+
+// 1
+struct PlayerDidTapCell: SyncAction {
+  var payload: Int
+  
+  // 2
+  static func updatedState(currentState: State, action: PlayerDidTapCell) -> State {
+    guard var state = currentState as? ApplicationState else {
+    	fatalError("Invalid state")
+    }
+    
+    state.board[action.payload] = state.turn
+    
+    // check if we have a winner
+    let winningLine = GameUtils.winningLine(for: state.board, lastMove: action.payload)
+    if let winningLine = winningLine {
+      state.isGameFinished = true
+      state.winningLine = winningLine
+      
+      switch state.turn {
+      case .one:
+        state.player1Score = state.player1Score + 10
+      case .two:
+        state.player2Score = state.player2Score + 10
+      }
+      
+      return state
+    }
+    
+    // check if we have other possible moves in the current game
+    if !state.board.contains(where: { $0 == nil }) {
+      state.isGameFinished = true
+      return state
+    }
+    
+    
+    // just change the turn
+    state.turn = state.turn == .one ? .two : .one
+    
+    return state
+  }
+}
+```
+
+As you can see in **(1)**, we can create an action by simply adopting the `SyncAction` protocol. Katana also has a protocol for [asyncronous actions](https://bendingspoons.github.io/katana-swift/Protocols/AsyncAction.html) and, in general, you can create your own action type by implementing the [Action protocol](https://bendingspoons.github.io/katana-swift/Protocols/Action.html).
+
+The core of the action is **(2)**. The `updateState` method is invoked by Katana to create the new store's state. There are two important things you need to remember when you implement this method:
+
+* You should **always** return a new copy of the store's state. If you use structs to implement the state (and you really should) this works out of the box
+* The method **must be a pure function**. A [pure function](https://en.wikipedia.org/wiki/Pure_function) is a function that always evaluates the same result value given the same argument values. It also doesn't contains side effects. As a rule of thumb, don't put disk interactions, API calls or anything related to external sources of information beside the action and the store in the method implementation. This may seem a big limitation but it is actually very important for many reasons. For instance, having pure `updateState` methods means that you can easily test this part of the logic because they are 100% predictable. Katana provides another way to add your side effects (e.g., API call), we will discuss it in the [fifth chapter](../Chapter5/README.md)
+
+
+
+We now have the action, but we need to trigger it somewhere.
+
+Open the `GameCell` file and change the properties by adding a new variable:
+
+```swift
+var didTap: () -> ()
+```
+
+We also need to update the `init` method:
+
+```swift
+init(key: Any, player: Player?, isWinningCell: Bool, didTap: @escaping () -> ()) {
+  self.player = player
+  self.isWinningCell = isWinningCell
+  self.didTap = didTap
+  self.setKey(key)
+}
+```
+
+We are basically adding another parameter to our cells. This closure should be invoked when the the user taps the button, so let's update it in our `childrenDescriptions` method:
+
+```swift
+var children: [AnyNodeDescription] = [
+  Button(props: .gameCellButtonProps(
+    isWinningCell: props.isWinningCell,
+    didTap: props.didTap,
+    key: Keys.button)
+  )
+]
+```
+
+
+
+Try to compile the application now: you should receive some errors in `GameBoard`.  We need, in fact, update the `GameCell` descriptions. Add this variable to the `GameBoard`'s `childrenDescriptions` method, just under the `winningLine` variable:
+
+```swift
+let cellCallback = { (index: Int) in
+  return {
+    if !props.isGameFinished {
+      // 1
+      dispatch(PlayerDidTapCell(payload: index))
+    }
+  }
+}
+```
+
+The important part here is **(1)**: when the cell is tapped, the closure will dispatch the action we created before with the proper cell's index. This will trigger a state update, which in turn will trigger a UI update.
+
+The last step is to update the cells in the following way:
+
+```swift
+      GameCell(props: GameCell.Props(key: Keys.cell1, player: props.board[0], isWinningCell: winningLine.contains(0), didTap: cellCallback(0))),
+
+      GameCell(props: GameCell.Props(key: Keys.cell2, player: props.board[1], isWinningCell: winningLine.contains(1), didTap: cellCallback(1))),
+      
+      GameCell(props: GameCell.Props(key: Keys.cell3, player: props.board[2], isWinningCell: winningLine.contains(2), didTap: cellCallback(2))),
+      
+      GameCell(props: GameCell.Props(key: Keys.cell4, player: props.board[3], isWinningCell: winningLine.contains(3), didTap: cellCallback(3))),
+      
+      GameCell(props: GameCell.Props(key: Keys.cell5, player: props.board[4], isWinningCell: winningLine.contains(4), didTap: cellCallback(4))),
+      
+      GameCell(props: GameCell.Props(key: Keys.cell6, player: props.board[5], isWinningCell: winningLine.contains(5), didTap: cellCallback(5))),
+      
+      GameCell(props: GameCell.Props(key: Keys.cell7, player: props.board[6], isWinningCell: winningLine.contains(6), didTap: cellCallback(6))),
+      
+      GameCell(props: GameCell.Props(key: Keys.cell8, player: props.board[7], isWinningCell: winningLine.contains(7), didTap: cellCallback(7))),
+      
+      GameCell(props: GameCell.Props(key: Keys.cell9, player: props.board[8], isWinningCell: winningLine.contains(8), didTap: cellCallback(8))),
+```
+
+We basically passed the proper `didTap` parameter to each cell.
+
+Compile and run: you should be able to play with the cells now!
 
 ### Manage A New Game
 
