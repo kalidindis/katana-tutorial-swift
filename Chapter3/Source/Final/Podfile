@@ -1,0 +1,7 @@
+platform :ios, '8.3'
+use_frameworks!
+
+target 'Chapter3' do
+  pod 'Katana', '~> 0.2.0'
+  pod 'KatanaElements', '~> 0.2.0'
+end
