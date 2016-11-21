@@ -118,11 +118,11 @@ extension GameBoard {
 }
 ```
 
-Besides the basic variables (frame, key and alpha), we define everything we need to manage the information we listed above. The `init` is used as default starting point and is required by the `Buildable` protcol. Also, it will be very useful in the future to test our UI without writing the logic of the application. For now, just copy this code in your project and let's move on to the next step: adding the first piece of UI to our application!
+Besides the basic variables (frame, key and alpha), we define everything we need to manage the information we listed above. The `init` is used as default starting point and is required by the `Buildable` protocol. Also, it will be very useful in the future to test our UI without writing the logic of the application. For now, just copy this code in your project and let's move on to the next step: adding the first piece of UI to our application!
 
 ### Players Score: Our First Piece of UI
 
-Let's start by adding the two labels that are used to show the player scores and the current turn, and the background.
+Let's start by adding the two labels that are used to show the player scores, the current turn, and the background.
 
 Let's delete the red view from `childrenDescriptions` and add this instead:
 
